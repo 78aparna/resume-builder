@@ -38,6 +38,9 @@ function View() {
 
 
   })
+  const skillRef = React.useRef()
+  
+  
   console.log(resumeDetails);
   
 
@@ -82,6 +85,20 @@ function View() {
   const handleReset = () => {
     setActiveStep(0);
   };
+  const addSkill = (skill)=>{
+    if(resumeDetails.userSkills.includes(skill)){
+      alert("The given skill already added, Please add another!!!")
+    }else{
+      SetResumeDetails({...resumeDetails,userSkills:[...resumeDetails.userSkills,skill]})
+      // to clear add skill textbox
+      skillRef.current.value = ""
+    }
+  }
+  const removeSkill = (skill)=>{
+    SetResumeDetails({...resumeDetails,userSkills:resumeDetails.userSkills.filter(item=>item!=skill)})
+  }
+
+
   const renderSteps =(stepCount)=>{
     switch(stepCount){
         case 0 : return(
@@ -141,15 +158,15 @@ function View() {
             <div>
                 <h4>Skills</h4>
                 <div className="d-flex align-items-center justify-content-between p-3 w-100">
-                  <input type="text" placeholder='Skills' className='form-control'/>
-                  <Button variant='text'>ADD</Button>
+                  <input ref={skillRef} type="text" placeholder='Skills' className='form-control'/>
+                  <Button onClick={()=>addSkill(skillRef.current.value)} variant='text'>ADD</Button>
 
                 </div>
                 <h5>Suggestions :</h5>
                 <div className="d-flex flex-wrap justify-content-between my-3">
                   {
                     SkillSuggestionArray.map((item,index)=>(
-                      <Button key={index} variant='outlined' className='m-1'>{item}</Button>
+                      <Button onClick={()=>addSkill(item)} key={index} variant='outlined' className='m-1'>{item}</Button>
                     )
                     )
                   }
@@ -157,8 +174,16 @@ function View() {
                 <h5>Added Skills :</h5>
                 <div className="d-flex flex-wrap justify-content-between my-3">
                   
-                   
-                      <Button variant="contained" className='m-1'>Node JS<ImCross className='ms-2'/></Button>
+                {
+                  resumeDetails.userSkills?.length>0?
+                  resumeDetails.userSkills?.map((skill,index)=>(
+                    <Button key={index} variant="contained" className='m-1'>{skill}<ImCross
+                    onClick={()=>removeSkill(skill)} className='ms-2'/></Button>
+                  ))
+                  :<p classNamefw-bolder>no skills are added yet!!!!</p>
+                
+                }
+                  
                     
                 </div>
             </div>
