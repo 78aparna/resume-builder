@@ -8,37 +8,22 @@ import Typography from '@mui/material/Typography';
 import TextField from '@mui/material/TextField';
 import { ImCross } from "react-icons/im";
 import { useState } from 'react';
+import { alertClasses } from '@mui/material';
+import { addResumeAPI } from '../SERVICES/allAPI';
+import { useNavigate } from 'react-router-dom';
+
 const steps = ['Basic Informations', 'Contact Details', 'Educational Details','Work Experience',
     'Skills & Certifications','Review & submit'];
-function View() {
+function View({resumeDetails,SetResumeDetails}) {
   const SkillSuggestionArray = ['Node JS','Java','Express JS','Mongo DB','Angular',
     'React JS','Leadership','Communication','Power BI']
  const [activeStep, setActiveStep] = React.useState(0);
   const [skipped, setSkipped] = React.useState(new Set());
   // create state for storing resume details
-  const [resumeDetails,SetResumeDetails]=React.useState({
-    username:"",
-    jobTitle:"",
-    location:"",
-    email:"",
-    mobile:"",
-    github:"",
-    linkedin:"",
-    portfolio:"",
-    course:"",
-    college:"",
-    university:"",
-    passoutyear:"",
-    jobtype:"",
-    company:"",
-    clocation:"",
-    duration:"",
-    userSkills:[],
-    summary:"",
-
-
-  })
+  
+  //reference to skill input tag
   const skillRef = React.useRef()
+  const navigate = useNavigate()
   
   
   console.log(resumeDetails);
@@ -200,6 +185,29 @@ function View() {
     }
 
   }
+  const handleAddResume = async ()=>{
+    const {username,jobTitle,location}=resumeDetails
+    if(!username&&!jobTitle&&!location){
+      alert("please fill the form completely...")
+    }else{
+       //api
+       console.log("api call");
+       try{
+        const result =await addResumeAPI(resumeDetails)
+        console.log(result);
+        if(result.status==201){
+          alert('Resume added successfully!!!!')
+          const{id} = result.data
+          //success redirect viewpage
+          navigate(`/resume/${id}/view`)
+        }
+       }catch(error){
+        console.log(error);
+        
+       }
+       
+    }
+  }
   return (
     <Box sx={{ width: '100%' }}>
       <Stepper activeStep={activeStep}>
@@ -253,9 +261,13 @@ function View() {
                 Skip
               </Button>
             )}
-            <Button onClick={handleNext}>
-              {activeStep === steps.length - 1 ? 'Finish' : 'Next'}
-            </Button>
+            {activeStep === steps.length - 1 ? (
+            
+            <Button onClick={handleAddResume}>Finish</Button>
+             ) : (
+            
+            <Button onClick={handleNext}>Next</Button>
+             )}
           </Box>
         </React.Fragment>
       )}
